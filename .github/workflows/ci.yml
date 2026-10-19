@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  JELLYFIN_REF: aec42b345e1a7da25ee5492183f12209338df688
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out plugin
+        uses: actions/checkout@v7
+        with:
+          path: Jellyfin.Plugin.DistributedHls
+      - name: Check out Jellyfin server source
+        uses: actions/checkout@v7
+        with:
+          repository: jellyfin/jellyfin
+          ref: ${{ env.JELLYFIN_REF }}
+          path: jellyfin
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+      - name: Build
+        run: dotnet build Jellyfin.Plugin.DistributedHls/src/Jellyfin.Plugin.DistributedHls -c Release
+      - name: Test
+        run: dotnet test Jellyfin.Plugin.DistributedHls/tests/DistributedHls.Core.Tests -c Release

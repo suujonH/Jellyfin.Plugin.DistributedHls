@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html><head><title>分布式 HLS</title></head><body>
+<div id="distributedHlsPage" data-role="page" class="page type-interior pluginConfigurationPage"
+     data-require="emby-input,emby-button,emby-select,emby-checkbox" data-controller="__plugin/distributedhls.js">
+    <div data-role="content"><div class="content-primary">
+        <form class="hlsForm">
+            <h2>分布式 HLS</h2>
+            <div class="checkboxContainer checkboxContainer-withDescription"><label><input is="emby-checkbox" type="checkbox" data-field="Enabled" /><span>启用 HLS</span></label><div class="fieldDescription">由 Worker 提前编码。播放时使用已发布的版本。</div></div>
+
+            <h3>原始资源</h3>
+            <div class="checkboxContainer"><label><input is="emby-checkbox" type="checkbox" data-field="AllowLocalOriginal" /><span>允许内网使用原始资源</span></label></div>
+            <p class="fieldDescription">下列用户在任何网络下都可以使用原始资源。</p>
+            <div class="originalUsers"></div>
+
+            <h3>媒体库</h3><div class="libraries"></div><p class="fieldDescription">不选媒体库时处理所有本地视频库。</p>
+            <h3>预编码质量</h3><div class="qualities"></div><p class="fieldDescription">不放大源视频。H.264、8 位 SDR、AAC、6 秒 fMP4 HLS。</p>
+
+            <h3>存储与调度</h3>
+            <div class="inputContainer"><label class="inputLabel" for="hlsOutputPath">HLS 输出目录</label><input is="emby-input" id="hlsOutputPath" data-field="OutputPath" required /><div class="fieldDescription">修改输出目录等同于迁移数据根目录，已发布成果会在新目录下查找。迁移时请连同 .distributed-hls 标记文件一起复制；如果有意改用新的空目录，请先在其中创建 .distributed-hls 文件，再执行“校验已发布成果”。</div></div>
+            <div class="checkboxContainer checkboxContainer-withDescription"><label><input is="emby-checkbox" type="checkbox" data-field="VerifyModifiedTime" /><span>校验修改时间</span></label><div class="fieldDescription">发布前核对成果文件的修改时间与 Worker 报告的一致（误差 2 秒）。存储不保留修改时间时关闭。</div></div>
+            <div class="inputContainer"><label class="inputLabel" for="hlsLeaseMinutes">任务租约（分钟）</label><input is="emby-input" id="hlsLeaseMinutes" data-field="LeaseMinutes" type="number" min="1" max="60" required /></div>
+            <div class="inputContainer"><label class="inputLabel" for="hlsMaxAttempts">最大重试次数</label><input is="emby-input" id="hlsMaxAttempts" data-field="MaxAttempts" type="number" min="1" max="20" required /><div class="fieldDescription">任务失败达到此次数后不再自动重试，重建工作列表后恢复。</div></div>
+            <div class="inputContainer"><label class="inputLabel" for="hlsOrphanHours">未关联成果保留时长（小时）</label><input is="emby-input" id="hlsOrphanHours" data-field="OrphanRetentionHours" type="number" min="0" max="8760" required /><div class="fieldDescription">没有任何条目引用的媒体，其成果在此时长后删除。重命名、移库或替换文件时不必重新编码。</div></div>
+            <div class="inputContainer"><label class="inputLabel" for="hlsTokenHours">播放授权有效期（小时）</label><input is="emby-input" id="hlsTokenHours" data-field="PlaybackTokenHours" type="number" min="1" max="168" required /></div>
+            <button is="emby-button" type="submit" class="raised button-submit block"><span>保存</span></button>
+        </form>
+
+        <h3>状态</h3>
+        <div class="hlsStatus" role="status"></div>
+
+        <h3>编码任务</h3>
+        <p class="fieldDescription">Worker 使用「控制台 → API 密钥」中创建的密钥连接。</p>
+        <div>
+            <button is="emby-button" type="button" class="raised rebuildJobs">重建工作列表</button>
+            <button is="emby-button" type="button" class="raised verifyPublished">校验已发布成果</button>
+            <button is="emby-button" type="button" class="raised refreshJobs">刷新</button>
+        </div>
+        <table class="detailTable">
+            <thead><tr>
+                <th class="detailTableHeaderCell">类型</th>
+                <th class="detailTableHeaderCell">状态</th>
+                <th class="detailTableHeaderCell">条目或 SHA</th>
+                <th class="detailTableHeaderCell">次数</th>
+                <th class="detailTableHeaderCell">Worker</th>
+                <th class="detailTableHeaderCell">错误</th>
+                <th class="detailTableHeaderCell">更新时间</th>
+            </tr></thead>
+            <tbody class="jobList"></tbody>
+        </table>
+    </div></div>
+</div></body></html>

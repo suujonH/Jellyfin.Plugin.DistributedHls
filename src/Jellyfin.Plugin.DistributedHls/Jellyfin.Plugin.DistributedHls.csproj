@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies></PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="$(JellyfinSourceRoot)/Jellyfin.Api/Jellyfin.Api.csproj" Private="false" />
+    <ProjectReference Include="../DistributedHls.Core/DistributedHls.Core.csproj" />
+    <EmbeddedResource Include="Configuration/config.html" />
+    <EmbeddedResource Include="Configuration/config.js" />
+  </ItemGroup>
+</Project>
